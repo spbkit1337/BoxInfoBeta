@@ -1,0 +1,66 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+using OpenHardwareMonitor;
+using OpenHardwareMonitor.Hardware; // add the reference
+using OpenHardwareMonitor.Collections;
+using System.Management;
+using System.IO;
+using System.Reflection;
+using System.Device.Location;
+using System.Net.NetworkInformation;
+
+namespace test
+{
+    public partial class Form1 : Form
+    {
+
+
+        public Form1()
+        {
+            InitializeComponent();
+            timer1.Interval = 1000;
+            timer1.Start();
+
+           
+        }
+
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+            Computer myComputer = new Computer();
+            myComputer.GPUEnabled = true;
+            myComputer.Open();
+
+            foreach (var hardwareItem in myComputer.Hardware)
+            {
+                if (hardwareItem.HardwareType == HardwareType.GpuNvidia)
+                {
+                    foreach (var sensor in hardwareItem.Sensors)
+                    {
+                        if (sensor.SensorType == SensorType.Temperature)
+                        {
+                            MessageBox.Show(sensor.Name + ":" + sensor.Value.GetValueOrDefault());
+                        }
+                    }
+                }
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+
+        }
+    }
+
+
+    
+}

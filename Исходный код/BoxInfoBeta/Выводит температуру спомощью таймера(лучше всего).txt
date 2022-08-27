@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+
+using OpenHardwareMonitor.Hardware; // add the reference
+using OpenHardwareMonitor.Collections;
+using System.Management;
+
+
+namespace test
+{
+    public partial class Form1 : Form
+    {
+
+
+        public Form1()
+        {
+            InitializeComponent();
+            timer1.Interval = 1000;
+            timer1.Start();
+
+           
+        }
+
+        static float cpuTemp;
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+
+
+            Computer myComputer = new Computer();
+            myComputer.GPUEnabled = true;
+            myComputer.CPUEnabled = true;
+            myComputer.Open();
+
+            foreach (var hardwareItem in myComputer.Hardware)
+            {
+                //GPU
+                if (hardwareItem.HardwareType == HardwareType.GpuAti || hardwareItem.HardwareType == HardwareType.GpuNvidia)
+                {
+                    foreach (var sensor in hardwareItem.Sensors)
+                    {
+                        if (sensor.SensorType == SensorType.Temperature)
+                        {
+                           
+                            label1.Text = sensor.Name + ":" + sensor.Value.GetValueOrDefault();
+                        }
+                    }
+                }
+            }
+
+            //CPU
+            foreach (var hardware in myComputer.Hardware)
+            {
+                if (hardware.HardwareType == HardwareType.CPU)
+                {
+                    hardware.Update();
+                    foreach (var sensor in hardware.Sensors)
+                    {
+                        if (sensor.SensorType == SensorType.Temperature && sensor.Name.Contains("CPU Package"))
+                        {
+                            // store
+                            cpuTemp = sensor.Value.GetValueOrDefault();
+                            // print to console
+
+                            label4.Text = "cpuTemp: " + sensor.Value.GetValueOrDefault();
+
+                        }
+                    }
+                }
+
+
+            }
+
+
+
+
+        }
+    }
+
+
+    
+}
